@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11120f">
+  <title>PeliDónde — encuentra dónde verla</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #11120f;
+      --surface: #191a16;
+      --surface-raised: #20211c;
+      --text: #f3f0e8;
+      --muted: #a4a397;
+      --line: #34352e;
+      --accent: #c9f36a;
+      --accent-ink: #1b2110;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 50% -24%, rgba(201, 243, 106, .11), transparent 49%),
+        var(--bg);
+      color: var(--text);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button, select { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .page { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; color: var(--text); text-decoration: none; font-weight: 760; letter-spacing: -.04em; font-size: 20px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 18px;
+    }
+    .topbar-meta { display: flex; align-items: center; gap: 18px; color: var(--muted); font-size: 13px; }
+    .country { display: inline-flex; align-items: center; gap: 7px; color: var(--text); }
+    .country-mark { font-size: 17px; }
+    .beta { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+    .hero { padding: 66px 0 42px; text-align: center; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { max-width: 720px; margin: 14px auto 12px; font-size: clamp(36px, 6vw, 58px); line-height: 1.04; letter-spacing: -.06em; }
+    .hero p { margin: 0; color: var(--muted); font-size: 17px; }
+    .search-wrap { max-width: 690px; margin: 30px auto 0; position: relative; }
+    .search-icon { position: absolute; left: 19px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 20px; pointer-events: none; }
+    .search-input {
+      width: 100%;
+      height: 62px;
+      padding: 0 20px 0 54px;
+      color: var(--text);
+      background: #1b1c17;
+      border: 1px solid #3b3d33;
+      border-radius: 15px;
+      font-size: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.2);
+    }
+    .search-input::placeholder { color: #77786e; }
+    .search-hint { margin-top: 10px; color: #77786e; font-size: 12px; }
+
+    .results { padding: 24px 0 72px; }
+    .results-top {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .results-top h2 { margin: 0; font-size: 20px; letter-spacing: -.03em; }
+    .count { margin-left: 8px; color: var(--muted); font-size: 13px; font-weight: 450; letter-spacing: 0; }
+    .filters { display: flex; flex-wrap: wrap; gap: 9px; }
+    .filter-select {
+      min-width: 148px;
+      padding: 10px 34px 10px 13px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .data-note {
+      display: flex;
+      gap: 9px;
+      align-items: start;
+      margin: 0 0 18px;
+      padding: 11px 14px;
+      border: 1px solid #4a482f;
+      border-radius: 11px;
+      background: rgba(201,243,106,.055);
+      color: #d7d4c6;
+      font-size: 12px;
+    }
+    .data-note strong { color: var(--accent); }
+    .source-note { margin: 10px 0 0; color: var(--muted); font-size: 11px; }
+    .source-note a { color: var(--accent); text-underline-offset: 3px; }
+    .movie-list { display: grid; gap: 12px; }
+    .movie-card {
+      display: grid;
+      grid-template-columns: 102px minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      min-height: 151px;
+      padding: 15px;
+      background: linear-gradient(110deg, #1a1b17, #171814);
+      border: 1px solid #2c2d27;
+      border-radius: var(--radius);
+      transition: border-color .2s, transform .2s;
+    }
+    .movie-card:hover { border-color: #555746; transform: translateY(-1px); }
+    .poster {
+      position: relative;
+      display: flex;
+      align-items: end;
+      width: 102px;
+      height: 120px;
+      overflow: hidden;
+      padding: 10px;
+      border-radius: 11px;
+      background: var(--poster);
+      isolation: isolate;
+    }
+    .poster::before, .poster::after { position: absolute; z-index: -1; content: ""; border-radius: 50%; }
+    .poster::before { width: 90px; height: 90px; top: -19px; right: -24px; background: rgba(255,255,255,.19); }
+    .poster::after { width: 105px; height: 65px; bottom: 13px; left: 19px; background: rgba(0,0,0,.2); transform: rotate(-32deg); }
+    .poster span { font-size: 11px; font-weight: 800; line-height: 1.1; text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+    .movie-info { min-width: 0; }
+    .movie-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .movie-title { margin: 0; font-size: 19px; line-height: 1.25; letter-spacing: -.03em; }
+    .kind { padding: 3px 7px; border-radius: 6px; background: #292a24; color: #c7c5b8; font-size: 10px; }
+    .meta { margin: 5px 0 12px; color: var(--muted); font-size: 12px; }
+    .offers { display: flex; flex-wrap: wrap; gap: 7px; }
+    .offer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border: 1px solid #36372f;
+      border-radius: 8px;
+      background: #20211c;
+      color: #e3e1d7;
+      font-size: 11px;
+    }
+    .offer-type { color: var(--accent); }
+    .offer-type.rent, .offer-type.buy { color: #eacb8a; }
+    .card-actions { align-self: stretch; display: flex; align-items: end; }
+    .report-button {
+      padding: 7px 9px;
+      color: #a4a397;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .report-button:hover { color: var(--text); border-color: var(--line); }
+    .empty-state { padding: 52px 20px; text-align: center; border: 1px dashed var(--line); border-radius: var(--radius); }
+    .empty-state h3 { margin: 0 0 6px; font-size: 18px; }
+    .empty-state p { margin: 0; color: var(--muted); font-size: 14px; }
+    .report-history { margin-top: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .report-history summary { padding: 14px 16px; color: var(--text); cursor: pointer; font-size: 13px; font-weight: 650; }
+    .report-history summary span { margin-left: 5px; color: var(--muted); font-weight: 450; }
+    .report-history-body { padding: 0 16px 16px; }
+    .report-history-note, .report-storage-error { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .report-storage-error { color: #f0ad9c; }
+    .saved-report { padding: 12px 0; border-top: 1px solid var(--line); }
+    .saved-report strong { display: block; font-size: 13px; }
+    .saved-report p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .footer { padding: 22px 0 30px; border-top: 1px solid rgba(255,255,255,.07); color: #77786e; font-size: 12px; text-align: center; }
+
+    dialog {
+      width: min(450px, calc(100% - 32px));
+      padding: 0;
+      color: var(--text);
+      background: #1b1c17;
+      border: 1px solid #414238;
+      border-radius: 18px;
+      box-shadow: 0 24px 90px rgba(0,0,0,.65);
+    }
+    dialog::backdrop { background: rgba(6,7,5,.72); backdrop-filter: blur(4px); }
+    .dialog-content { padding: 24px; }
+    .dialog-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+    .dialog-head h2 { margin: 0; font-size: 21px; letter-spacing: -.04em; }
+    .dialog-head p { margin: 5px 0 20px; color: var(--muted); font-size: 13px; }
+    .close-button { width: 32px; height: 32px; flex: 0 0 auto; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 9px; }
+    .field { display: grid; gap: 7px; margin: 14px 0; color: #d8d6ca; font-size: 12px; font-weight: 600; }
+    .field select, .field textarea { width: 100%; padding: 11px; color: var(--text); background: #13140f; border: 1px solid #393a32; border-radius: 9px; }
+    .field textarea { min-height: 80px; resize: vertical; }
+    .submit-button { width: 100%; margin-top: 7px; padding: 12px; color: var(--accent-ink); background: var(--accent); border: 0; border-radius: 10px; font-weight: 750; }
+    .form-message { margin: 12px 0 0; color: var(--accent); font-size: 13px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 680px) {
+      .page { width: min(100% - 28px, 520px); }
+      .topbar { height: 64px; }
+      .hero { padding: 47px 0 31px; }
+      .hero p { font-size: 15px; }
+      .search-input { height: 56px; }
+      .results-top { align-items: start; flex-direction: column; }
+      .filters { width: 100%; }
+      .filter-select { flex: 1; min-width: 0; }
+      .movie-card { grid-template-columns: 76px minmax(0, 1fr); gap: 13px; padding: 12px; }
+      .poster { width: 76px; height: 105px; }
+      .movie-title { font-size: 16px; }
+      .meta { margin: 4px 0 9px; }
+      .card-actions { grid-column: 2; justify-content: start; margin-top: -6px; }
+      .report-button { padding: 5px 0; }
+      .topbar-meta { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar page">
+    <a class="brand" href="#" aria-label="PeliDónde, inicio">
+      <span class="brand-mark" aria-hidden="true">▶</span>
+      <span>PeliDónde</span>
+    </a>
+    <div class="topbar-meta">
+      <span class="country"><span class="country-mark" aria-hidden="true">🇲🇽</span> México</span>
+      <span class="beta">Prototipo</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">Una búsqueda. Todas tus plataformas.</div>
+      <h1 id="page-title">Que no te manden a buscar en la app equivocada.</h1>
+      <p>Encuentra dónde ver esa película o serie en México.</p>
+      <div class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <label class="sr-only" for="search">Buscar película o serie</label>
+        <input id="search" class="search-input" type="search" placeholder="Busca por título… por ejemplo, Dune" autocomplete="off">
+        <div class="search-hint">Prueba con un título, como “Dune” o “The Bear”.</div>
+      </div>
+    </section>
+
+    <section class="results" aria-labelledby="results-title">
+      <div class="results-top">
+        <h2 id="results-title">Explora títulos <span id="result-count" class="count"></span></h2>
+        <div class="filters" aria-label="Filtros de resultados">
+          <label class="sr-only" for="platform-filter">Filtrar por plataforma</label>
+          <select id="platform-filter" class="filter-select">
+            <option value="">Todas las plataformas</option>
+          </select>
+          <label class="sr-only" for="type-filter">Filtrar por tipo</label>
+          <select id="type-filter" class="filter-select">
+            <option value="">Películas y series</option>
+            <option value="Película">Películas</option>
+            <option value="Serie">Series</option>
+          </select>
+          <label class="sr-only" for="availability-filter">Filtrar por modalidad</label>
+          <select id="availability-filter" class="filter-select">
+            <option value="">Cualquier modalidad</option>
+            <option value="Suscripción">Incluida con suscripción</option>
+            <option value="Renta">Renta</option>
+            <option value="Compra">Compra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="data-note">
+        <span aria-hidden="true">ⓘ</span>
+        <span><strong>Disponibilidad verificada:</strong> consulta manual de JustWatch México del 26 nov 2026. Es una instantánea, no una actualización en vivo; abre la fuente de cada título para confirmar cambios.</span>
+      </div>
+      <div id="movie-list" class="movie-list" aria-live="polite"></div>
+      <details id="report-history" class="report-history">
+        <summary>Mis reportes en este navegador <span id="report-count">(0)</span></summary>
+        <div class="report-history-body">
+          <p class="report-history-note">Se guardan únicamente en este navegador. No se envían ni los revisa el equipo de PeliDónde.</p>
+          <p id="report-storage-error" class="report-storage-error" role="status" hidden></p>
+          <div id="saved-reports"></div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer page">PeliDónde · México · Fuente: JustWatch · consulta manual del 26 nov 2026</footer>
+
+  <dialog id="report-dialog" aria-labelledby="report-title">
+    <form id="report-form" class="dialog-content">
+      <div class="dialog-head">
+        <div>
+          <h2 id="report-title">¿Encontraste un dato incorrecto?</h2>
+          <p>Cuéntanos qué disponibilidad deberíamos revisar para <strong id="report-movie"></strong>.</p>
+        </div>
+        <button class="close-button" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <label class="field" for="report-offer">¿Qué opción quieres reportar?
+        <select id="report-offer" required>
+          <option value="">Selecciona plataforma y modalidad</option>
+        </select>
+      </label>
+      <label class="field" for="report-reason">¿Qué está mal?
+        <select id="report-reason" required>
+          <option value="">Selecciona un motivo</option>
+          <option>Ya no está disponible en esa plataforma</option>
+          <option>La modalidad (suscripción, renta o compra) es incorrecta</option>
+          <option>Es otro título con el mismo nombre</option>
+          <option>Otro</option>
+        </select>
+      </label>
+      <label class="field" for="report-details">Detalle (opcional)
+        <textarea id="report-details" placeholder="Por ejemplo, la encontré en otra plataforma…"></textarea>
+      </label>
+      <button class="submit-button" type="submit">Enviar reporte</button>
+      <p id="form-message" class="form-message" role="status" hidden></p>
+    </form>
+  </dialog>
+
+  <script>
+    const titles = [
+      {
+        title: "Dune: Parte dos", year: 2024, kind: "Película", genre: "Ciencia ficción · 2 h 47 min",
+        aliases: ["Dune: Part Two", "Dune 2"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/pelicula/duna-parte-dos",
+        poster: "linear-gradient(145deg, #c17e3e, #4a3024 76%)", offers: [
+          { platform: "HBO Max", type: "Suscripción" },
+          { platform: "Prime Video", detail: "canal HBO Max", type: "Suscripción" },
+          { platform: "Prime Video", detail: "canal Universal+", type: "Suscripción" },
+          { platform: "Apple TV Store", type: "Renta" },
+          { platform: "Prime Video", type: "Renta" },
+          { platform: "Apple TV Store", type: "Compra" },
+          { platform: "Prime Video", type: "Compra" }
+        ]
+      },
+      {
+        title: "El oso", year: 2022, kind: "Serie", genre: "Drama · 5 temporadas",
+        aliases: ["The Bear"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/serie/the-bear",
+        poster: "linear-gradient(145deg, #b95d38, #48251f 76%)", offers: [
+          { platform: "Disney+", type: "Suscripción" }
+        ]
+      },
+      {
+        title: "Spider-Man: Cruzando el Multiverso", year: 2023, kind: "Película", genre: "Animación · 2 h 20 min",
+        aliases: ["Spider-Man: A través del Spider-Verso", "Spider-Man: Across the Spider-Verse", "Spider-Verse"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/pelicula/spider-man-into-the-spider-verse-2",
+        poster: "linear-gradient(145deg, #bd3b52, #302a62 76%)", offers: [
+          { platform: "Netflix", type: "Suscripción" },
+          { platform: "Netflix", detail: "plan con anuncios", type: "Suscripción" },
+          { platform: "Prime Video", type: "Renta" },
+          { platform: "Apple TV Store", type: "Renta" },
+          { platform: "Prime Video", type: "Compra" },
+          { platform: "Apple TV Store", type: "Compra" }
+        ]
+      },
+      {
+        title: "Pobres criaturas", year: 2023, kind: "Película", genre: "Drama · 2 h 21 min",
+        aliases: ["Poor Things"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/pelicula/poor-things",
+        poster: "linear-gradient(145deg, #b6a1cb, #4b3b64 76%)", offers: [
+          { platform: "Disney+", type: "Suscripción" }
+        ]
+      },
+      {
+        title: "Separación", year: 2022, kind: "Serie", genre: "Suspenso · 2 temporadas",
+        aliases: ["Severance"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/serie/severance",
+        poster: "linear-gradient(145deg, #738c83, #273f3b 76%)", offers: [
+          { platform: "Apple TV+", type: "Suscripción" },
+          { platform: "Prime Video", detail: "canal Apple TV", type: "Suscripción" }
+        ]
+      },
+      {
+        title: "Todo a la vez en todas partes", year: 2022, kind: "Película", genre: "Aventura · 2 h 19 min",
+        aliases: ["Todo en todas partes al mismo tiempo", "Everything Everywhere All at Once"],
+        checkedAt: "26 nov 2026", sourceUrl: "https://www.justwatch.com/mx/pelicula/everything-everywhere-all-at-once",
+        poster: "linear-gradient(145deg, #d19b54, #623d66 76%)", offers: [
+          { platform: "Prime Video", type: "Suscripción" },
+          { platform: "HBO Max", type: "Suscripción" },
+          { platform: "Prime Video", detail: "canal HBO Max", type: "Suscripción" },
+          { platform: "Prime Video", detail: "plan con anuncios", type: "Suscripción" },
+          { platform: "Prime Video", detail: "canal Diamond Films", type: "Suscripción" },
+          { platform: "Prime Video", type: "Renta" },
+          { platform: "Apple TV Store", type: "Renta" },
+          { platform: "Prime Video", type: "Compra" },
+          { platform: "Apple TV Store", type: "Compra" }
+        ]
+      }
+    ];
+
+    const searchInput = document.querySelector("#search");
+    const platformFilter = document.querySelector("#platform-filter");
+    const typeFilter = document.querySelector("#type-filter");
+    const availabilityFilter = document.querySelector("#availability-filter");
+    const movieList = document.querySelector("#movie-list");
+    const resultCount = document.querySelector("#result-count");
+    const reportDialog = document.querySelector("#report-dialog");
+    const reportForm = document.querySelector("#report-form");
+    const formMessage = document.querySelector("#form-message");
+    const reportOfferSelect = document.querySelector("#report-offer");
+    const savedReportsElement = document.querySelector("#saved-reports");
+    const reportCount = document.querySelector("#report-count");
+    const reportStorageError = document.querySelector("#report-storage-error");
+    const reportStorageKey = "pelidonde:reports";
+    let activeReportTitle = "";
+    let localReports = [];
+    let reportStorageAvailable = true;
+
+    try {
+      const savedValue = localStorage.getItem(reportStorageKey);
+      if (savedValue) {
+        const parsedReports = JSON.parse(savedValue);
+        if (!Array.isArray(parsedReports)) throw new Error("El historial guardado no tiene el formato esperado.");
+        localReports = parsedReports;
+      }
+    } catch (error) {
+      reportStorageAvailable = false;
+      reportStorageError.hidden = false;
+      reportStorageError.textContent = "No se pudo acceder al almacenamiento local de este navegador.";
+      console.error("No se pudo leer el historial local de reportes.", error);
+    }
+
+    function renderReports() {
+      reportCount.textContent = `(${localReports.length})`;
+      savedReportsElement.replaceChildren();
+      localReports.forEach((report) => {
+        const entry = document.createElement("article");
+        entry.className = "saved-report";
+        const title = document.createElement("strong");
+        title.textContent = `${report.title} — ${report.platform} (${report.availability})`;
+        const reason = document.createElement("p");
+        reason.textContent = report.reason;
+        const date = document.createElement("p");
+        date.textContent = new Date(report.reportedAt).toLocaleString("es-MX");
+        entry.append(title, reason, date);
+        if (report.details) {
+          const details = document.createElement("p");
+          details.textContent = report.details;
+          entry.append(details);
+        }
+        savedReportsElement.append(entry);
+      });
+    }
+
+    const platforms = [...new Set(titles.flatMap((item) => item.offers.map((offer) => offer.platform)))].sort();
+    platforms.forEach((platform) => {
+      const option = document.createElement("option");
+      option.value = platform;
+      option.textContent = platform;
+      platformFilter.append(option);
+    });
+
+    function renderTitles() {
+      const query = normalizeSearchText(searchInput.value);
+      const platform = platformFilter.value;
+      const kind = typeFilter.value;
+      const availability = availabilityFilter.value;
+      const filtered = titles.filter((item) => {
+        const searchTerms = [item.title, ...(item.aliases || [])];
+        const matchesTitle = searchTerms.some((term) => normalizeSearchText(term).includes(query));
+        const matchesKind = !kind || item.kind === kind;
+        const matchesOffer = item.offers.some((offer) =>
+          (!platform || offer.platform === platform) &&
+          (!availability || offer.type === availability)
+        );
+        return matchesTitle && matchesKind && matchesOffer;
+      });
+
+      resultCount.textContent = `${filtered.length} ${filtered.length === 1 ? "título" : "títulos"}`;
+      if (!filtered.length) {
+        movieList.innerHTML = '<div class="empty-state"><h3>No encontramos ese título</h3><p>Prueba con otro nombre o cambia los filtros.</p></div>';
+        return;
+      }
+
+      function normalizeSearchText(value) {
+        return value.normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLocaleLowerCase("es-MX")
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+      }
+
+      movieList.innerHTML = filtered.map((item) => {
+        const offers = item.offers.map((offer) => {
+          const typeClass = offer.type === "Suscripción" ? "" : offer.type === "Renta" ? "rent" : "buy";
+          const label = offer.type === "Suscripción" ? "Incluida con suscripción" : offer.type;
+          return `<span class="offer"><span>${offerName(offer)}</span><span class="offer-type ${typeClass}">${label}</span></span>`;
+        }).join("");
+        return `
+          <article class="movie-card">
+            <div class="poster" style="--poster: ${item.poster}" aria-hidden="true"><span>${item.title}</span></div>
+            <div class="movie-info">
+              <div class="movie-title-row"><h3 class="movie-title">${item.title}</h3><span class="kind">${item.kind}</span></div>
+              <p class="meta">${item.year} · ${item.genre}</p>
+              <div class="offers" aria-label="Opciones de disponibilidad">${offers}</div>
+              <p class="source-note">Consultado el ${item.checkedAt} · <a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Ver fuente en JustWatch México</a></p>
+            </div>
+            <div class="card-actions"><button class="report-button" type="button" data-report="${item.title}">Reportar dato</button></div>
+          </article>`;
+      }).join("");
+
+      movieList.querySelectorAll("[data-report]").forEach((button) => {
+        button.addEventListener("click", () => openReport(button.dataset.report));
+      });
+    }
+
+    function offerName(offer) {
+      return offer.detail ? `${offer.platform} (${offer.detail})` : offer.platform;
+    }
+
+    function openReport(title) {
+      activeReportTitle = title;
+      const item = titles.find((entry) => entry.title === title);
+      document.querySelector("#report-movie").textContent = title;
+      reportForm.reset();
+      reportOfferSelect.replaceChildren(new Option("Selecciona plataforma y modalidad", ""));
+      item.offers.forEach((offer, index) => {
+        const label = offer.type === "Suscripción" ? "Incluida con suscripción" : offer.type;
+        reportOfferSelect.append(new Option(`${offerName(offer)} — ${label}`, String(index)));
+      });
+      formMessage.hidden = true;
+      reportDialog.showModal();
+    }
+
+    [searchInput, platformFilter, typeFilter, availabilityFilter].forEach((control) => {
+      control.addEventListener(control === searchInput ? "input" : "change", renderTitles);
+    });
+
+    document.querySelector(".close-button").addEventListener("click", () => reportDialog.close());
+    reportDialog.addEventListener("click", (event) => {
+      if (event.target === reportDialog) reportDialog.close();
+    });
+    reportForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!reportForm.reportValidity()) return;
+      const item = titles.find((entry) => entry.title === activeReportTitle);
+      const offer = item.offers[Number(reportOfferSelect.value)];
+      const label = offer.type === "Suscripción" ? "incluida con suscripción" : offer.type.toLowerCase();
+      const report = {
+        title: activeReportTitle,
+        platform: offerName(offer),
+        availability: label,
+        reason: reportForm.querySelector("#report-reason").value,
+        details: reportForm.querySelector("#report-details").value.trim(),
+        reportedAt: new Date().toISOString()
+      };
+      if (!reportStorageAvailable) {
+        formMessage.textContent = "No se pudo guardar el reporte en este navegador. No se envió a ningún servidor.";
+        formMessage.hidden = false;
+        return;
+      }
+      const updatedReports = [report, ...localReports];
+      try {
+        localStorage.setItem(reportStorageKey, JSON.stringify(updatedReports));
+      } catch (error) {
+        reportStorageError.hidden = false;
+        reportStorageError.textContent = "El navegador no permitió guardar el reporte localmente.";
+        reportStorageAvailable = false;
+        formMessage.textContent = "No se pudo guardar el reporte. No se envió a ningún servidor.";
+        formMessage.hidden = false;
+        console.error("No se pudo guardar el reporte localmente.", error);
+        return;
+      }
+      localReports = updatedReports;
+      renderReports();
+      document.querySelector("#report-history").open = true;
+      formMessage.textContent = "Reporte guardado en este navegador. Nadie lo recibe todavía.";
+      formMessage.hidden = false;
+      reportForm.querySelector(".submit-button").textContent = "Reporte guardado";
+      reportForm.querySelector(".submit-button").disabled = true;
+    });
+    reportDialog.addEventListener("close", () => {
+      reportForm.querySelector(".submit-button").textContent = "Enviar reporte";
+      reportForm.querySelector(".submit-button").disabled = false;
+    });
+
+    renderReports();
+    renderTitles();
+  </script>
+</body>
+</html>
