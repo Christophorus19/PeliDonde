@@ -111,3 +111,16 @@ test("missing TMDb token returns an actionable configuration error", async () =>
   assert.equal(response.status, 503);
   assert.match(body.error, /TMDB_API_READ_ACCESS_TOKEN/);
 });
+
+test("malformed provider response is returned as an upstream error", async () => {
+  const baseUrl = await startServer({
+    apiToken: "test-token",
+    fetchImpl: async () => jsonResponse({ unexpected: true })
+  });
+
+  const response = await fetch(`${baseUrl}/api/providers?type=tv&id=42`);
+  const body = await response.json();
+
+  assert.equal(response.status, 502);
+  assert.match(body.error, /disponibilidad inválida/);
+});

@@ -82,6 +82,7 @@ async function fetchTmdb(endpoint, params, apiToken, fetchImpl) {
 }
 
 function normalizeSearchResult(result, requestedType) {
+  if (!result || typeof result !== "object") return null;
   const mediaType = result.media_type || requestedType;
   if (mediaType !== "movie" && mediaType !== "tv") return null;
 
@@ -201,12 +202,13 @@ async function routeRequest(request, response, apiToken, fetchImpl) {
       include_adult: "false"
     };
     const result = await fetchTmdb(endpoint, params, apiToken, fetchImpl);
-    const results = Array.isArray(result.results)
-      ? result.results
-        .map((item) => normalizeSearchResult(item, type))
-        .filter(Boolean)
-        .slice(0, MAX_RESULTS)
-      : [];
+    if (!Array.isArray(result.results)) {
+      throw new HttpError(502, "TMDb devolvió una respuesta de búsqueda inválida.");
+    }
+    const results = result.results
+      .map((item) => normalizeSearchResult(item, type))
+      .filter(Boolean)
+      .slice(0, MAX_RESULTS);
     sendJson(response, 200, { results });
     return;
   }
@@ -220,6 +222,9 @@ async function routeRequest(request, response, apiToken, fetchImpl) {
     }
 
     const result = await fetchTmdb(`/3/${type}/${id}/watch/providers`, {}, apiToken, fetchImpl);
+    if (!result.results || typeof result.results !== "object" || Array.isArray(result.results)) {
+      throw new HttpError(502, "TMDb devolvió una respuesta de disponibilidad inválida.");
+    }
     const country = result.results && result.results.MX;
     sendJson(response, 200, {
       region: "MX",
