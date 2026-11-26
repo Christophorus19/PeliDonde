@@ -1,0 +1,13 @@
+{
+  "name": "pelidonde",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Buscador de disponibilidad de películas y series en México",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "test": "node --test"
+  }
+}
