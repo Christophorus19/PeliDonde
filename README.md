@@ -1,6 +1,8 @@
-# PeliDónde
+# PeliDonde — PeliDónde
 
-Buscador de películas y series para México. El catálogo no está escrito a mano: las búsquedas consultan TMDb y la disponibilidad se consulta por título e identificador.
+Buscador de películas y series para México. Nace para comprobar las recomendaciones de videos cortos (TikTok, YouTube y Facebook) y mostrar en qué plataforma está cada título, distinguiendo suscripción, renta, compra y canales.
+
+El catálogo no está escrito a mano: las búsquedas consultan TMDb y la disponibilidad se consulta por título e identificador.
 
 ## Requisitos
 
