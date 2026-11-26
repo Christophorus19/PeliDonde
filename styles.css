@@ -123,6 +123,9 @@ h1 { max-width: 720px; margin: 14px auto 12px; font-size: clamp(36px, 6vw, 58px)
 .footer { padding: 22px 0 30px; border-top: 1px solid rgba(255,255,255,.07); color: #8d8e82; font-size: 11px; text-align: center; }
 .footer p { margin: 5px 0; }
 .footer a { color: var(--accent); text-underline-offset: 3px; }
+.credits h2 { margin: 0 0 7px; color: var(--text); font-size: 13px; }
+.tmdb-attribution { display: inline-flex; align-items: center; margin: 5px 0; padding: 5px 8px; border-radius: 6px; background: #f3f0e8; }
+.footer .tmdb-logo { display: block; width: 120px; height: auto; }
 
 dialog { width: min(450px, calc(100% - 32px)); padding: 0; color: var(--text); background: #1b1c17; border: 1px solid #414238; border-radius: 18px; box-shadow: 0 24px 90px rgba(0,0,0,.65); }
 dialog::backdrop { background: rgba(6,7,5,.72); backdrop-filter: blur(4px); }

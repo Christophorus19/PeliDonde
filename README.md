@@ -7,7 +7,7 @@ El catálogo no está escrito a mano: las búsquedas consultan TMDb y la disponi
 ## Requisitos
 
 - Node.js 22.9 o posterior
-- Un token de lectura de la API de TMDb
+- Un token de lectura de la API de TMDb, que puedes solicitar gratis para uso no comercial
 
 ## Configuración
 
@@ -29,6 +29,10 @@ Las búsquedas requieren conexión a Internet y un token válido. La cobertura d
 
 ## Atribución
 
-La disponibilidad de streaming proviene de JustWatch mediante la API de TMDb. JustWatch requiere atribución para estos datos. Los enlaces de disponibilidad llevan a la ficha de TMDb; la API no garantiza enlaces directos a cada proveedor.
+La disponibilidad de streaming proviene de JustWatch mediante la API de TMDb. JustWatch requiere atribución para estos datos. Los enlaces de disponibilidad llevan a la ficha de TMDb; la API no garantiza enlaces directos a cada proveedor. La interfaz incluye el logotipo oficial de TMDb y la atribución exigida por su API.
 
 This product uses the TMDB API but is not endorsed or certified by TMDB.
+
+## Costos y uso
+
+La API de TMDb es gratuita para proyectos no comerciales si se cumple su atribución. No hay dependencias pagadas ni costo de ejecución local en este proyecto. Si la app se monetiza o se usa para generar ingresos, TMDb requiere una licencia comercial; revisa sus [preguntas frecuentes](https://developer.themoviedb.org/docs/faq) y [términos de la API](https://www.themoviedb.org/api-terms-of-use). El alojamiento en Internet no está configurado; este repositorio se ejecuta localmente.
